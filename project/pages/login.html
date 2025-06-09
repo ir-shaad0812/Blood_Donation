@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - LifeShare Blood Donation</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">LifeShare</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="donor-registration.html">Donate</a></li>
+            <li><a href="blood-requests.html">Blood Request</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="login.html" class="login-btn active">Login</a></li>
+        </ul>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <main style="padding-top: 80px;">
+        <div class="form-container">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Login to Your Account</h2>
+            <form id="loginForm" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+                <p style="text-align: center; margin-top: 1rem;">
+                    Don't have an account? 
+                    <a href="register.html" style="color: var(--primary-color);">Register here</a>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <script src="../js/main.js"></script>
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+    
+            if (!validateForm(event.target)) {
+                return false;
+            }
+    
+            const loginData = {
+                email: email,
+                password: password
+            };
+    
+            fetch("http://localhost:3000/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Login successful") {
+                    const user = {
+                        email: email,
+                        name: name,
+                        role: 'donor'
+                    };
+    
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    showAlert('Login successful! Redirecting...', 'success');
+    
+                    setTimeout(() => {
+                        window.location.href = '../pages/profile.html';
+                    }, 1500);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('An error occurred. Please try again.', 'error');
+            });
+    
+            return false;
+        }
+    
+    </script>
+    
+</body>
+</html>

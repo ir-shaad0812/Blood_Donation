@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - LifeShare Blood Donation</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">LifeShare</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="donor-registration.html">Donate</a></li>
+            <li><a href="blood-requests.html">Request Blood</a></li>
+            <li><a href="profile.html" class="active">Profile</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="login.html" class="login-btn">Login</a></li>
+        </ul>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <main style="padding-top: 80px;">
+        <div class="form-container">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Profile</h2>
+            <div id="profile-info">
+                <p><strong>Email:</strong> <span id="user-email">User not found</span></p>
+            </div>
+
+            <h3>Update Password</h3>
+            <form id="updatePasswordForm" onsubmit="return handlePasswordUpdate(event)">
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" name="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Update Password</button>
+            </form>
+
+            <h3>Delete Account</h3>
+            <button id="deleteAccountBtn" class="btn" style="width: 100%;" onclick="handleAccountDeletion()">Delete Account</button>
+            <div style="height: 20px;"></div>
+            <button class="btn" style="width: 100%;" onclick="logout()">Logout</button>
+        </div>
+    </main>
+
+    <script src="../js/main.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (user && user.email) {
+            document.getElementById('user-email').textContent = user.email;
+        } else {
+            document.getElementById('user-email').textContent = 'User not found';
+        }
+
+        function validatePassword(password) {
+            const regex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
+            return regex.test(password);
+        }
+
+        function handlePasswordUpdate(event) {
+            event.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            if (!validatePassword(newPassword)) {
+                alert('New password must be at least 8 characters long and contain letters, numbers, and special characters.');
+                return;
+            }
+
+            if (!user || !user.email) {
+                alert('No email found in localStorage. Please log in again.');
+                return;
+            }
+
+            fetch('http://localhost:3000/api/user/update-password', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user.email, currentPassword, newPassword }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.message === 'Password updated successfully') {
+                    window.location.href = '/login.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function handleAccountDeletion() {
+            if (!user || !user.email) {
+                alert('No valid user data found. Please log in again.');
+                return;
+            }
+            if (confirm('Are you sure you want to delete your account?')) {
+                fetch('http://localhost:3000/api/user/delete-account', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user.email }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.message === 'Account deleted successfully') {
+                        localStorage.clear();
+                        window.location.href = '/login.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            }
+        }
+
+    </script>
+</body>
+</html>
