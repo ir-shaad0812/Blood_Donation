@@ -1,8 +1,8 @@
-🩸 Blood Donation System
+## 🩸 Blood Donation System
 
 A web-based platform designed to streamline blood donation and receiving processes. This system allows users to register, log in, donate blood, request blood, and manage their account credentials securely and efficiently.
 
-🚀 Features
+## 🚀 Features
 
 User Registration & Authentication
 
@@ -10,7 +10,7 @@ Secure registration and login functionality
 
 Password encryption and validation
 
-Donate Blood
+## Donate Blood
 
 Users can submit blood donation requests
 
